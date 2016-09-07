@@ -2,8 +2,6 @@
 # 9/7/2016 Modified for python 3. Changed print statements, exceptions
 # todo
 # allow exclusion of directory path segment such as Chrome\User Data
-# see if we can get a better exception message with more detail for I/O exception
-
 
 
 import sys
@@ -22,6 +20,7 @@ import os
 # todo - check for exception if parameter is entered as -x
 # todo - allow only new files or only old files
 # 2013/02/20 - allow for the exclusion of specific directories.Can only use the directory name, not a path
+# 9/7/2016 - Better exception message with more detail for I/O exception
 
 def usage():
     print ('\nUsage: LON.py --root,--r Top of directory tree --n,--num Number of files to list\n--e, --excl Exclude suffixes  --x, --xdir Exclude directories')
@@ -88,6 +87,8 @@ if len(exclude) > 0:
 
 if len(exdir) > 0:
         print ("  Excluding directories", exdir)
+
+print ("")
    
 for rootfolder, dirs, files in os.walk(root, topdown=True):  
 
@@ -122,10 +123,11 @@ for rootfolder, dirs, files in os.walk(root, topdown=True):
                 try:
                     stats = os.stat(fullpath)
                 #except IOError as (errno, strerror):
-                except IOError:
-                    print ("I/O error - path %s"  % (fullpath))
-                except WindowsError:
-                    print ("Windows error - path %s" % (fullpath))
+                except IOError as e:
+                    print ("I/O error - path: %s  error: %s  errno: %d"  % (fullpath, e.strerror, e.errno))                    
+                    
+                except WindowsError as e:
+                    print ("Windows error - path: %s  error: %s  errno: %d" % (fullpath, e.strerror, e.errno))
 
                 # create tuple (year yyyy, month(1-12), day(1-31), hour(0-23), minute(0-59), second(0-59),
                 # weekday(0-6, 0 is monday), Julian day(1-366), daylight flag(-1,0 or 1)) from seconds since epoch
